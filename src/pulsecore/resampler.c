@@ -1525,7 +1525,6 @@ static int speex_init(pa_resampler *r) {
 
     pa_assert(r);
 
-
     if (r->method >= PA_RESAMPLER_SPEEX_FIXED_BASE && r->method <= PA_RESAMPLER_SPEEX_FIXED_MAX) {
 
         q = r->method - PA_RESAMPLER_SPEEX_FIXED_BASE;
