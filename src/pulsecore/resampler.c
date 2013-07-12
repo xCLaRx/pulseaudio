@@ -78,14 +78,14 @@ struct pa_resampler {
 };
 
 static pa_resampler_implementation auto_impl = {
-    .name = { [PA_RESAMPLER_AUTO] = "auto" },
+    .names = { "auto" },
 };
 
 static int copy_init(pa_resampler *r);
 
 static pa_resampler_implementation copy_impl = {
     .init = copy_init,
-    .name = { [PA_RESAMPLER_COPY] = "copy" },
+    .names = { "copy" },
 };
 
 static int trivial_init(pa_resampler*r);
@@ -102,7 +102,7 @@ static pa_resampler_implementation trivial_impl = {
     .resample = trivial_resample,
     .update_rates = trivial_update_rates_or_reset,
     .reset = trivial_update_rates_or_reset,
-    .name = { [PA_RESAMPLER_TRIVIAL] = "trivial" },
+    .names = { [PA_RESAMPLER_TRIVIAL] = "trivial" },
 };
 
 #ifdef HAVE_SPEEX
@@ -116,28 +116,28 @@ static pa_resampler_implementation speex_impl = {
     .free = speex_free,
     .update_rates = speex_update_rates,
     .reset = speex_reset,
-    .name = { [PA_RESAMPLER_SPEEX_FLOAT_BASE + 0]    = "speex-float-0",
-              [PA_RESAMPLER_SPEEX_FLOAT_BASE + 1]    = "speex-float-1",
-              [PA_RESAMPLER_SPEEX_FLOAT_BASE + 2]    = "speex-float-2",
-              [PA_RESAMPLER_SPEEX_FLOAT_BASE + 3]    = "speex-float-3",
-              [PA_RESAMPLER_SPEEX_FLOAT_BASE + 4]    = "speex-float-4",
-              [PA_RESAMPLER_SPEEX_FLOAT_BASE + 5]    = "speex-float-5",
-              [PA_RESAMPLER_SPEEX_FLOAT_BASE + 6]    = "speex-float-6",
-              [PA_RESAMPLER_SPEEX_FLOAT_BASE + 7]    = "speex-float-7",
-              [PA_RESAMPLER_SPEEX_FLOAT_BASE + 8]    = "speex-float-8",
-              [PA_RESAMPLER_SPEEX_FLOAT_BASE + 9]    = "speex-float-9",
-              [PA_RESAMPLER_SPEEX_FLOAT_BASE + 10]   = "speex-float-10",
-              [PA_RESAMPLER_SPEEX_FIXED_BASE + 0]    = "speex-fixed-0",
-              [PA_RESAMPLER_SPEEX_FIXED_BASE + 1]    = "speex-fixed-1",
-              [PA_RESAMPLER_SPEEX_FIXED_BASE + 2]    = "speex-fixed-2",
-              [PA_RESAMPLER_SPEEX_FIXED_BASE + 3]    = "speex-fixed-3",
-              [PA_RESAMPLER_SPEEX_FIXED_BASE + 4]    = "speex-fixed-4",
-              [PA_RESAMPLER_SPEEX_FIXED_BASE + 5]    = "speex-fixed-5",
-              [PA_RESAMPLER_SPEEX_FIXED_BASE + 6]    = "speex-fixed-6",
-              [PA_RESAMPLER_SPEEX_FIXED_BASE + 7]    = "speex-fixed-7",
-              [PA_RESAMPLER_SPEEX_FIXED_BASE + 8]    = "speex-fixed-8",
-              [PA_RESAMPLER_SPEEX_FIXED_BASE + 9]    = "speex-fixed-9",
-              [PA_RESAMPLER_SPEEX_FIXED_BASE + 10]   = "speex-fixed-10",
+    .names = { "speex-float-0",
+               "speex-float-1",
+               "speex-float-2",
+               "speex-float-3",
+               "speex-float-4",
+               "speex-float-5",
+               "speex-float-6",
+               "speex-float-7",
+               "speex-float-8",
+               "speex-float-9",
+               "speex-float-10",
+               "speex-fixed-0",
+               "speex-fixed-1",
+               "speex-fixed-2",
+               "speex-fixed-3",
+               "speex-fixed-4",
+               "speex-fixed-5",
+               "speex-fixed-6",
+               "speex-fixed-7",
+               "speex-fixed-8",
+               "speex-fixed-9",
+               "speex-fixed-10",
     }
 };
 #endif
@@ -155,7 +155,7 @@ static pa_resampler_implementation ffmpeg_impl = {
     .init = ffmpeg_init,
     .free = ffmpeg_free,
     .resample = ffmpeg_resample,
-    .name = { [PA_RESAMPLER_FFMPEG] = "ffmpeg" },
+    .names = { "ffmpeg" },
 };
 
 static int peaks_init(pa_resampler*r);
@@ -167,7 +167,7 @@ static pa_resampler_implementation peaks_impl = {
     .resample = peaks_resample,
     .update_rates = peaks_update_rates_or_reset,
     .reset = peaks_update_rates_or_reset,
-    .name = { [PA_RESAMPLER_PEAKS] = "peaks" },
+    .names = { "peaks" },
 };
 
 struct peaks{ /* data specific to the peak finder pseudo resampler */
@@ -191,11 +191,11 @@ static pa_resampler_implementation libsamplerate_impl = {
     .resample = libsamplerate_resample,
     .update_rates = libsamplerate_update_rates,
     .reset = libsamplerate_reset,
-    .name = { [PA_RESAMPLER_SRC_SINC_BEST_QUALITY]   = "src-sinc-best-quality",
-              [PA_RESAMPLER_SRC_SINC_MEDIUM_QUALITY] = "src-sinc-best-quality",
-              [PA_RESAMPLER_SRC_SINC_FASTEST]        = "src-sinc-fastest",
-              [PA_RESAMPLER_SRC_ZERO_ORDER_HOLD]     = "src-zero-order-hold",
-              [PA_RESAMPLER_SRC_LINEAR]              = "src-linear"
+    .names = { "src-sinc-best-quality",
+               "src-sinc-best-quality",
+               "src-sinc-fastest",
+               "src-zero-order-hold",
+               "src-linear"
     },
 };
 #endif
@@ -204,15 +204,15 @@ static void calc_map_table(pa_resampler *r);
 
 static pa_resampler_implementation *impl_table[] = {
 #ifdef HAVE_LIBSAMPLERATE
-    [PA_RESAMPLER_SRC_LINEAR] = &libsamplerate_impl,
+    [PA_RESAMPLER_SRC_SINC_FASTEST] = &libsamplerate_impl,
 #else
-    [PA_RESAMPLER_SRC_LINEAR] = NULL,
+    [PA_RESAMPLER_SRC_SINC_FASTEST] = NULL,
 #endif
     [PA_RESAMPLER_TRIVIAL] = &trivial_impl,
 #ifdef HAVE_SPEEX
-    [PA_RESAMPLER_SPEEX_FIXED_BASE] = &speex_impl,
+    [PA_RESAMPLER_SPEEX_FLOAT_BASE] = &speex_impl,
 #else
-    [PA_RESAMPLER_SPEEX_FIXED_BASE] = NULL,
+    [PA_RESAMPLER_SPEEX_FLOAT_BASE] = NULL,
 #endif
     [PA_RESAMPLER_FFMPEG] = &ffmpeg_impl,
     [PA_RESAMPLER_AUTO] = &auto_impl,
@@ -379,9 +379,9 @@ static pa_resample_method_t find_base_method(pa_resample_method_t method) {
     pa_assert(method < PA_RESAMPLER_MAX);
 
     if (method >= PA_RESAMPLER_SPEEX_FLOAT_BASE && method <= PA_RESAMPLER_SPEEX_FIXED_MAX) {
-        return PA_RESAMPLER_SPEEX_FIXED_BASE;
+        return PA_RESAMPLER_SPEEX_FLOAT_BASE;
     } else if (method <= PA_RESAMPLER_SRC_LINEAR)
-        return PA_RESAMPLER_SRC_LINEAR;
+        return PA_RESAMPLER_SRC_SINC_BEST_QUALITY;
     else
         return method;
 }
@@ -633,7 +633,7 @@ const char *pa_resample_method_to_string(pa_resample_method_t m) {
         return NULL;
 
     if ((impl = impl_table[find_base_method(m)]) != NULL)
-        return impl->name[m];
+        return impl->names[m - find_base_method(m)];
     else
         return NULL;
 }
