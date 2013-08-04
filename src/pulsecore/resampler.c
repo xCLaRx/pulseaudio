@@ -81,12 +81,12 @@ struct pa_resampler {
     void *impl_data;
 };
 
-struct trivial { /* data specific to the trivial resampler */
+struct trivial_data { /* data specific to the trivial resampler */
     unsigned o_counter;
     unsigned i_counter;
 };
 
-struct peaks{ /* data specific to the peak finder pseudo resampler */
+struct peaks_data { /* data specific to the peak finder pseudo resampler */
     unsigned o_counter;
     unsigned i_counter;
 
@@ -95,18 +95,18 @@ struct peaks{ /* data specific to the peak finder pseudo resampler */
 };
 
 #ifdef HAVE_LIBSAMPLERATE
-struct src{ /* data specific to libsamplerate */
+struct src_data { /* data specific to libsamplerate */
     SRC_STATE *state;
 };
 #endif
 
 #ifdef HAVE_SPEEX
-struct speex{ /* data specific to speex */
+struct speex_data { /* data specific to speex */
     SpeexResamplerState* state;
 };
 #endif
 
-struct ffmpeg { /* data specific to ffmpeg */
+struct ffmpeg_data { /* data specific to ffmpeg */
     struct AVResampleContext *state;
     pa_memchunk buf[PA_CHANNELS_MAX];
 };
@@ -1257,7 +1257,7 @@ static void save_leftover(pa_resampler *r, void *buf, size_t len) {
 #ifdef HAVE_LIBSAMPLERATE
 static void libsamplerate_resample(pa_resampler *r, const pa_memchunk *input, unsigned in_n_frames, pa_memchunk *output, unsigned *out_n_frames) {
     SRC_DATA data;
-    struct src *libsamplerate_data;
+    struct src_data *libsamplerate_data;
 
     pa_assert(r);
     pa_assert(input);
@@ -1292,7 +1292,7 @@ static void libsamplerate_resample(pa_resampler *r, const pa_memchunk *input, un
 }
 
 static void libsamplerate_update_rates(pa_resampler *r) {
-    struct src *libsamplerate_data;
+    struct src_data *libsamplerate_data;
     pa_assert(r);
 
     libsamplerate_data = r->impl_data;
@@ -1300,7 +1300,7 @@ static void libsamplerate_update_rates(pa_resampler *r) {
 }
 
 static void libsamplerate_reset(pa_resampler *r) {
-    struct src *libsamplerate_data;
+    struct src_data *libsamplerate_data;
     pa_assert(r);
 
     libsamplerate_data = r->impl_data;
@@ -1308,7 +1308,7 @@ static void libsamplerate_reset(pa_resampler *r) {
 }
 
 static void libsamplerate_free(pa_resampler *r) {
-    struct src *libsamplerate_data;
+    struct src_data *libsamplerate_data;
     pa_assert(r);
 
     libsamplerate_data = r->impl_data;
@@ -1318,11 +1318,11 @@ static void libsamplerate_free(pa_resampler *r) {
 
 static int libsamplerate_init(pa_resampler *r) {
     int err;
-    struct src *libsamplerate_data;
+    struct src_data *libsamplerate_data;
 
     pa_assert(r);
 
-    libsamplerate_data = pa_xnew(struct src, 1);
+    libsamplerate_data = pa_xnew(struct src_data, 1);
 
     if (!(libsamplerate_data->state = src_new(r->method, r->o_ss.channels, &err)))
         return -1;
@@ -1343,7 +1343,7 @@ static int libsamplerate_init(pa_resampler *r) {
 static void speex_resample_float(pa_resampler *r, const pa_memchunk *input, unsigned in_n_frames, pa_memchunk *output, unsigned *out_n_frames) {
     float *in, *out;
     uint32_t inf = in_n_frames, outf = *out_n_frames;
-    struct speex *speex_data;
+    struct speex_data *speex_data;
 
     pa_assert(r);
     pa_assert(input);
@@ -1367,7 +1367,7 @@ static void speex_resample_float(pa_resampler *r, const pa_memchunk *input, unsi
 static void speex_resample_int(pa_resampler *r, const pa_memchunk *input, unsigned in_n_frames, pa_memchunk *output, unsigned *out_n_frames) {
     int16_t *in, *out;
     uint32_t inf = in_n_frames, outf = *out_n_frames;
-    struct speex *speex_data;
+    struct speex_data *speex_data;
 
     pa_assert(r);
     pa_assert(input);
@@ -1389,7 +1389,7 @@ static void speex_resample_int(pa_resampler *r, const pa_memchunk *input, unsign
 }
 
 static void speex_update_rates(pa_resampler *r) {
-    struct speex *speex_data;
+    struct speex_data *speex_data;
     pa_assert(r);
 
     speex_data = r->impl_data;
@@ -1398,7 +1398,7 @@ static void speex_update_rates(pa_resampler *r) {
 }
 
 static void speex_reset(pa_resampler *r) {
-    struct speex *speex_data;
+    struct speex_data *speex_data;
     pa_assert(r);
 
     speex_data = r->impl_data;
@@ -1407,7 +1407,7 @@ static void speex_reset(pa_resampler *r) {
 }
 
 static void speex_free(pa_resampler *r) {
-    struct speex *speex_data;
+    struct speex_data *speex_data;
     pa_assert(r);
 
     speex_data = r->impl_data;
@@ -1419,11 +1419,11 @@ static void speex_free(pa_resampler *r) {
 
 static int speex_init(pa_resampler *r) {
     int q, err;
-    struct speex *speex_data;
+    struct speex_data *speex_data;
 
     pa_assert(r);
 
-    speex_data = pa_xnew(struct speex, 1);
+    speex_data = pa_xnew(struct speex_data, 1);
 
     r->impl_free = speex_free;
     r->impl_update_rates = speex_update_rates;
@@ -1457,7 +1457,7 @@ static void trivial_resample(pa_resampler *r, const pa_memchunk *input, unsigned
     size_t fz;
     unsigned i_index, o_index;
     void *src, *dst;
-    struct trivial *trivial_data;
+    struct trivial_data *trivial_data;
 
     pa_assert(r);
     pa_assert(input);
@@ -1499,7 +1499,7 @@ static void trivial_resample(pa_resampler *r, const pa_memchunk *input, unsigned
 }
 
 static void trivial_update_rates_or_reset(pa_resampler *r) {
-    struct trivial *trivial_data;
+    struct trivial_data *trivial_data;
     pa_assert(r);
 
     trivial_data = r->impl_data;
@@ -1509,10 +1509,10 @@ static void trivial_update_rates_or_reset(pa_resampler *r) {
 }
 
 static int trivial_init(pa_resampler*r) {
-    struct trivial *trivial_data;
+    struct trivial_data *trivial_data;
     pa_assert(r);
 
-    trivial_data = pa_xnew0(struct trivial, 1);
+    trivial_data = pa_xnew0(struct trivial_data, 1);
 
     r->impl_resample = trivial_resample;
     r->impl_update_rates = trivial_update_rates_or_reset;
@@ -1528,7 +1528,7 @@ static void peaks_resample(pa_resampler *r, const pa_memchunk *input, unsigned i
     unsigned c, o_index = 0;
     unsigned i, i_end = 0;
     void *src, *dst;
-    struct peaks *peaks_data;
+    struct peaks_data *peaks_data;
 
     pa_assert(r);
     pa_assert(input);
@@ -1623,7 +1623,7 @@ static void peaks_resample(pa_resampler *r, const pa_memchunk *input, unsigned i
 }
 
 static void peaks_update_rates_or_reset(pa_resampler *r) {
-    struct peaks *peaks_data;
+    struct peaks_data *peaks_data;
     pa_assert(r);
 
     peaks_data = r->impl_data;
@@ -1633,12 +1633,12 @@ static void peaks_update_rates_or_reset(pa_resampler *r) {
 }
 
 static int peaks_init(pa_resampler*r) {
-    struct peaks *peaks_data;
+    struct peaks_data *peaks_data;
     pa_assert(r);
     pa_assert(r->i_ss.rate >= r->o_ss.rate);
     pa_assert(r->work_format == PA_SAMPLE_S16NE || r->work_format == PA_SAMPLE_FLOAT32NE);
 
-    peaks_data = pa_xnew(struct peaks, 1);
+    peaks_data = pa_xnew0(struct peaks_data, 1);
     peaks_data->o_counter = peaks_data->i_counter = 0;
     memset(peaks_data->max_i, 0, sizeof(peaks_data->max_i));
     memset(peaks_data->max_f, 0, sizeof(peaks_data->max_f));
@@ -1656,7 +1656,7 @@ static int peaks_init(pa_resampler*r) {
 static void ffmpeg_resample(pa_resampler *r, const pa_memchunk *input, unsigned in_n_frames, pa_memchunk *output, unsigned *out_n_frames) {
     unsigned used_frames = 0, c;
     int previous_consumed_frames = -1;
-    struct ffmpeg *ffmpeg_data;
+    struct ffmpeg_data *ffmpeg_data;
 
     pa_assert(r);
     pa_assert(input);
@@ -1728,7 +1728,7 @@ static void ffmpeg_resample(pa_resampler *r, const pa_memchunk *input, unsigned 
 
 static void ffmpeg_free(pa_resampler *r) {
     unsigned c;
-    struct ffmpeg *ffmpeg_data;
+    struct ffmpeg_data *ffmpeg_data;
 
     pa_assert(r);
 
@@ -1743,11 +1743,11 @@ static void ffmpeg_free(pa_resampler *r) {
 
 static int ffmpeg_init(pa_resampler *r) {
     unsigned c;
-    struct ffmpeg *ffmpeg_data;
+    struct ffmpeg_data *ffmpeg_data;
 
     pa_assert(r);
 
-    ffmpeg_data = pa_xnew(struct ffmpeg, 1);
+    ffmpeg_data = pa_xnew(struct ffmpeg_data, 1);
 
     /* We could probably implement different quality levels by
      * adjusting the filter parameters here. However, ffmpeg
