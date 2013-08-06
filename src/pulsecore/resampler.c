@@ -77,6 +77,8 @@ struct pa_resampler {
     pa_resampler_impl impl;
 };
 
+/* This is a dummy implementation that only exist
+ * to map the PA_RESAMPLER_AUTO method to its name */
 static pa_resampler_impl auto_impl = {
     .names = { "auto" },
 };
